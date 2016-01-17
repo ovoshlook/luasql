@@ -353,7 +353,6 @@ static int conn_gc (lua_State *L) {
 	return 0;
 }
 
-
 /*
 ** Close a Connection object.
 */
@@ -438,6 +437,15 @@ static int conn_rollback (lua_State *L) {
 	return 1;
 }
 
+/*
+** Get next result for current transaction.
+*/
+static int conn_getnext (lua_State *L) {
+	conn_data *conn = getconnection (L);
+	int status = mysql_next_result(conn->my_conn);
+	lua_pushinteger(L, status);
+	return 1;
+}
 
 /*
 ** Set "auto commit" property of the connection. Modes ON/OFF
@@ -501,7 +509,7 @@ static int env_connect (lua_State *L) {
 		return luasql_faildirect(L, "error connecting: Out of memory.");
 
 	if (!mysql_real_connect(conn, host, username, password, 
-		sourcename, port, NULL, 0))
+		sourcename, port, NULL, CLIENT_MULTI_RESULTS))
 	{
 		char error_msg[100];
 		strncpy (error_msg,  mysql_error(conn), 99);
@@ -556,7 +564,8 @@ static void create_metatables (lua_State *L) {
         {"commit", conn_commit},
         {"rollback", conn_rollback},
         {"setautocommit", conn_setautocommit},
-		{"getlastautoid", conn_getlastautoid},
+	{"getlastautoid", conn_getlastautoid},
+	{"getnext",conn_getnext},
 		{NULL, NULL},
     };
     struct luaL_Reg cursor_methods[] = {
