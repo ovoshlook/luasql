@@ -13,3 +13,18 @@ LuaSQL is free software and uses the same license as Lua 5.1.
 Source code for LuaSQL can be downloaded from its GitHub repository.
 
 conn:getnext() - resolve CALL statements to execute stored procedures.
+
+While original project not includes this code do next
+
+luarocks install luasql-mysql MYSQL_INCDIR=/path/to/inc/dir
+
+Get from this git /src/ls_mysql.c
+
+compile it:
+gcc -I/usr/include/mysql/ -I/usr/include/lua5.1 ls_mysql.c -shared -o mysql.so -fPIC
+
+save original mysql.so: 
+cp /usr/local/lib/lua/5.1/luasql/mysql.so /usr/local/lib/lua/5.1/luasql/mysql.so.orig
+
+copy compiled new .so to luasql folder:
+cp mysql.so /usr/local/lib/lua/5.1/luasql/
